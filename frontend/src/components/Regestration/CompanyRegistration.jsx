@@ -91,7 +91,7 @@ const CompanyRegistration = () => {
       setTimeout(() => navigate('/login'), 1200);
     } catch (error) {
       console.error('Registration error:', error);
-      const backendMessage = error?.data?.detail || error?.data?.message || error?.message;
+      const backendMessage = error?.response?.data?.detail || error?.response?.data?.message || error?.message;
       setToastMessage(backendMessage || 'Unable to create company right now. Please try again later.');
     } finally {
       setLoading(false);

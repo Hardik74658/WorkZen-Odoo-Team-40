@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import signup from '../../assets/signup.jpg';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,12 +9,18 @@ import Toast from '../layout/Toast.jsx';
 import Loader from '../layout/Loader.jsx';
 
 const Login = () => {
+  const demoCredentials = {
+    eid: 'GIHAHA20250001',
+    password: 'Hardik@1234',
+  };
+
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: demoCredentials,
+  });
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -23,22 +29,14 @@ const Login = () => {
   const [loader, setLoader] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
-  const demoCredentials = useMemo(
-    () => ({
-      admin: { eid: 'WFZ-ADMIN-001', password: 'Admin@123' },
-      employee: { eid: 'WFZ-EMP-001', password: 'Employee@123' },
-    }),
-    []
-  );
-
-  const handlePrefill = (role) => {
-    const creds = demoCredentials[role];
-    if (!creds) return;
-    setValue('eid', creds.eid, { shouldValidate: true, shouldDirty: true });
-    setValue('password', creds.password, { shouldValidate: true, shouldDirty: true });
-    setToastMessage(`Filled demo credentials for ${role === 'admin' ? 'Admin' : 'Employee'}.`);
+  const setCookie = (name, value, days = 7) => {
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+    const encodedValue = encodeURIComponent(value);
+    const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+    const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${name}=${encodedValue}; expires=${expires}; path=/; SameSite=Lax${secureFlag}`;
   };
-  
+
   const onSubmit = async (data) => {
     setLoader(true);
     setError(''); // Clear previous errors
@@ -47,9 +45,14 @@ const Login = () => {
         eid: data.eid.trim(),
         password: data.password,
       };
+      console.log("Login payload:", payload);
+      
 
       const res = await login(payload);
-      if (res?.status === 200) {
+      console.log("Login response:", res);
+      
+      if (res?.status == 200) {
+        const token = res?.data?.token || '';
         const userPayload = res?.data?.user || res?.data || {};
         if (userPayload?.eid) {
           localStorage.setItem('userId', userPayload.eid);
@@ -59,17 +62,25 @@ const Login = () => {
         } else if (userPayload?.role?.name) {
           localStorage.setItem('role', userPayload.role.name);
         }
+        if (token) {
+          localStorage.setItem('authToken', token);
+          setCookie('authToken', token);
+        }
+        if (userPayload && Object.keys(userPayload).length > 0) {
+          const serializedUser = JSON.stringify(userPayload);
+          setCookie('userData', serializedUser);
+        }
 
-        dispatch(sliceLogin(userPayload));
+        dispatch(sliceLogin({ ...userPayload, token }));
         setLoader(false);
         setToastMessage('Login successful!');
-        navigate('/landing_page');
+        navigate('/employees');
       } else {
         throw new Error(res?.data?.detail || 'Unexpected error occurred');
       }
     } catch (error) {
       console.error("Login error:", error);
-      const backendMessage = error?.data?.detail || error?.data?.message || error?.message;
+      const backendMessage = error?.response?.data?.detail || error?.response?.data?.message || error?.message;
       setError(backendMessage || 'Network error');
       setLoader(false);
     }
@@ -110,21 +121,10 @@ const Login = () => {
             <p className="max-w-sm text-sm md:text-base text-white/80">
               Manage attendance, leave approvals, and payroll insights from a single dashboard tailored to your role.
             </p>
-            <div className="flex  flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => handlePrefill('admin')}
-                className="btn btn-primary bg-white text-black hover:bg-gray-300 text-xs sm:text-sm"
-              >
-                Try as Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => handlePrefill('employee')}
-                className="btn btn-primary text-xs sm:text-sm"
-              >
-                Try as Employee
-              </button>
+            <div className="space-y-1 text-xs sm:text-sm">
+              <p className="font-semibold text-white">Demo credentials</p>
+              <p className="text-white/80">EID: {demoCredentials.eid}</p>
+              <p className="text-white/80">Password: {demoCredentials.password}</p>
             </div>
           </div>
         </div>

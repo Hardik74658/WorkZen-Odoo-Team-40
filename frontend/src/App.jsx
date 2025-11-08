@@ -53,7 +53,7 @@ function App() {
             email: response.data.email,
             currentStartup: response.data.currentStartup,
             profilePicture: response.data.profilePicture,
-            role : response.data.role.name 
+            role : response.data.role?.name 
           };
           dispatch(loggedIn(serializableUserData));
         } else {
@@ -67,7 +67,7 @@ function App() {
       });
   }, [dispatch]);
 
-  axios.defaults.baseURL = '/api';
+  
 
   return (
     <Routes>
@@ -110,7 +110,7 @@ function App() {
       <Route
         path="/employees"
         element={
-          <AuthLayout authentication={false}>
+          <AuthLayout authentication={true}>
             <Employees />
           </AuthLayout>
         }
