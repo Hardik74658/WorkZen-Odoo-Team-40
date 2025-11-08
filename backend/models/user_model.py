@@ -28,6 +28,8 @@ class User(Base):
     # Relationships
     company = relationship("Company", back_populates="users")
     role = relationship("Role", back_populates="users")
+    attendances = relationship("Attendance", back_populates="user", foreign_keys="Attendance.eid")
+
 
     def __repr__(self):
         return f"<User(eid={self.eid}, name={self.name}, role_id={self.role_id}, company={self.company_id})>"

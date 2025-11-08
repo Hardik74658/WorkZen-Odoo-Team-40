@@ -224,3 +224,41 @@ def delete_user_controller(db: Session, eid: str):
     db.delete(user)
     db.commit()
     return {"message": f"User {eid} deleted successfully"}
+
+def create_employee(db: Session, data: UserCreate):
+    
+    # check email duplicate
+    user_exists = db.query(User).filter(
+        User.personal_email == data.personal_email
+    ).first()
+
+    if user_exists:
+        raise HTTPException(status_code=400, detail="Personal email already exists")
+
+    # generate EID
+    eid = generate_eid(
+        db=db,
+        company_id=data.company_id,
+        full_name=data.name,
+        date_of_joining=data.date_of_joining
+    )
+
+    new_user = User(
+        eid=eid,
+        company_id=data.company_id,
+        role_id=data.role_id,
+        name=data.name,
+        personal_email=data.personal_email,
+        company_email=data.company_email,
+        password_hash=hash_password(data.password),
+        department=data.department,
+        position=data.position,
+        date_of_joining=data.date_of_joining,
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
+
