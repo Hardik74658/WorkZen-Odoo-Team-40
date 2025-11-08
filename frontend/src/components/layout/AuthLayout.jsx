@@ -40,8 +40,6 @@ const AuthLayout = ({ children, authentication }) => {
   }, [cookieUserData, cookieUserProfile, rawUserRoleCookie]);
 
   const normalizedRole = useMemo(() => {
-    const candidate = user || cookieUserData || cookieUserProfile;
-    if (!candidate) return null;
     const extract = (value) => {
       if (!value) return null;
       if (typeof value === 'string') return value.toLowerCase();
@@ -52,16 +50,22 @@ const AuthLayout = ({ children, authentication }) => {
       return null;
     };
 
-    return (
-      extract(user.role) ||
-      extract(user.role_name) ||
-      extract(user.roleName) ||
-      extract(cookieUserData?.role) ||
-      extract(cookieUserData?.role_name) ||
-      extract(cookieUserProfile?.role) ||
-      extract(cookieRole) ||
-      null
-    );
+    const candidates = [
+      user?.role,
+      user?.role_name,
+      user?.roleName,
+      cookieUserData?.role,
+      cookieUserData?.role_name,
+      cookieUserProfile?.role,
+      cookieRole,
+    ];
+
+    for (const candidate of candidates) {
+      const normalized = extract(candidate);
+      if (normalized) return normalized;
+    }
+
+    return null;
   }, [user, cookieUserData, cookieUserProfile, cookieRole]);
 
   const allowedRolesForPath = useMemo(() => {
