@@ -14,6 +14,8 @@ class UserCreate(BaseModel):
     department: Optional[str] = None
     position: Optional[str] = None
     date_of_joining: Optional[datetime] = None
+    bank_account: Optional[str] = None          # ✅ NEW
+    manager_id: Optional[str] = None            # ✅ NEW
 
 class UserOut(BaseModel):
     eid: str
@@ -23,6 +25,8 @@ class UserOut(BaseModel):
     name: str
     personal_email: EmailStr
     company_email: Optional[EmailStr]
+    bank_account: Optional[str] = None          # ✅ NEW
+    manager_id: Optional[str] = None            # ✅ NEW
 
     department: Optional[str]
     position: Optional[str]

@@ -14,12 +14,14 @@ class AttendanceCreate(BaseModel):
     approved_by: Optional[str] = None
 
 
+
 # ✅ Response Schema
 class AttendanceOut(BaseModel):
     attendance_id: int
     eid: str
     company_id: int
     date: date
+    worked_hours: Optional[float] = 0.0 
     check_in: Optional[time]
     check_out: Optional[time]
     status: Optional[str]

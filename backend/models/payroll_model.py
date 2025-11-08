@@ -9,7 +9,7 @@ class Payroll(Base):
     __tablename__ = "payrolls"
 
     payroll_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    eid = Column(String(30), ForeignKey("users.eid"), nullable=False)
+    eid = Column(String(30), ForeignKey("user.eid"), nullable=False)
     company_id = Column(Integer, ForeignKey("companies.company_id"), nullable=False)
 
     month = Column(String(20), nullable=False)
@@ -18,12 +18,14 @@ class Payroll(Base):
     deductions = Column(Float, default=0)
     net_pay = Column(Float, nullable=False)
     status = Column(String(20), default="Pending")  # Pending, Approved, Paid
-    approved_by = Column(String(30), ForeignKey("users.eid"), nullable=True)
+    approved_by = Column(String(30), ForeignKey("user.eid"), nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    user = relationship("User", backref="payrolls")
+    user = relationship("User", foreign_keys=[eid], back_populates="payrolls")          # employee who gets salary
+    approved_user = relationship("User", foreign_keys=[approved_by])                    # admin/payroll officer who approved it
+
 
     def __repr__(self):
         return f"<Payroll(eid={self.eid}, month={self.month}, status={self.status})>"

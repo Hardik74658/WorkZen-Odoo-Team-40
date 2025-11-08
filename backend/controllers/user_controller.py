@@ -103,7 +103,7 @@ def login_user(db: Session, eid: str, password: str):
     token = create_access_token({
         "eid": user.eid,
         "role": user.role.name,
-       
+        
     })
 
     return {
@@ -114,7 +114,7 @@ def login_user(db: Session, eid: str, password: str):
             "name": user.name,
             "role": user.role.name,
             "company": user.company.name,
-            "role_id": user.role.rid,
+            "role_id": user.rid,
             "company_id": user.company_id
         }
     }

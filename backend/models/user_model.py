@@ -22,6 +22,10 @@ class User(Base):
 
     is_first_login = Column(Boolean, default=True)
 
+    
+    bank_account = Column(String(50), nullable=True)           # Bank A/c number or IBAN
+    manager_id = Column(String(30), ForeignKey("users.eid"), nullable=True)  # R
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -29,6 +33,8 @@ class User(Base):
     company = relationship("Company", back_populates="users")
     role = relationship("Role", back_populates="users")
     attendances = relationship("Attendance", back_populates="user", foreign_keys="Attendance.eid")
+    leaves = relationship("LeaveRequest", back_populates="user", foreign_keys="LeaveRequest.eid")
+    payrolls = relationship("Payroll", back_populates="user", foreign_keys="Payroll.eid")
 
 
     def __repr__(self):

@@ -1,6 +1,6 @@
 # models/attendance_model.py
 
-from sqlalchemy import Column, Integer, String, Date, Time, Boolean, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Date, Time, Boolean, ForeignKey, DateTime, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from config.database import Base
@@ -17,6 +17,7 @@ class Attendance(Base):
     check_out = Column(Time, nullable=True)
     status = Column(String(20), default="Present")  # Present, Absent, Half-Day, On Leave
     approved = Column(Boolean, default=True)
+    worked_hours = Column(Float, default=0.0)  
     approved_by = Column(String(30), ForeignKey("user.eid"), nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
