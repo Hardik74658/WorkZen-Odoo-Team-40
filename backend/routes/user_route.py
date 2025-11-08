@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from config.database import get_db
 from schemas.user_schema import UserCreate, UserOut, UserLogin, AdminRegister
-from controllers.user_controller import create_user, get_all_users, login_user, admin_register
+from controllers.user_controller import create_user, get_all_users, login_user, admin_register, view_user_controller, update_user_controller, delete_user_controller
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -25,3 +25,20 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
 @router.post("/register-admin")
 def register_admin(data: AdminRegister, db: Session = Depends(get_db)):
     return admin_register(db, data)
+
+# 👁️ View single user by EID
+@router.get("/user/{eid}", response_model=UserOut)
+def view_user(eid: str, db: Session = Depends(get_db)):
+    return view_user_controller(db, eid)
+
+
+# ✏️ Update user info
+@router.put("/user/{eid}", response_model=UserOut)
+def update_user(eid: str, data: dict, db: Session = Depends(get_db)):
+    return update_user_controller(db, eid, data)
+
+
+# ❌ Delete user
+@router.delete("/user/{eid}")
+def delete_user(eid: str, db: Session = Depends(get_db)):
+    return delete_user_controller(db, eid)

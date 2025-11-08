@@ -194,3 +194,33 @@ def admin_register(db: Session, data):
             "email": new_user.personal_email
         }
     }
+
+
+def view_user_controller(db: Session, eid: str):
+    user = db.query(User).filter(User.eid == eid).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+def update_user_controller(db: Session, eid: str, data: dict):
+    user = db.query(User).filter(User.eid == eid).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    for key, value in data.items():
+        if hasattr(user, key):
+            setattr(user, key, value)
+
+    db.commit()
+    db.refresh(user)
+    return user
+
+# ❌ Delete user
+def delete_user_controller(db: Session, eid: str):
+    user = db.query(User).filter(User.eid == eid).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db.delete(user)
+    db.commit()
+    return {"message": f"User {eid} deleted successfully"}
