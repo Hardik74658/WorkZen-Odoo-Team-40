@@ -1,12 +1,35 @@
-# React + Vite
+# WorkZen Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite SPA for the WorkZen HRMS landing experience and authenticated dashboard shell.
 
-Currently, two official plugins are available:
+## Quick start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Install dependencies (run from `frontend/`):
+	```powershell
+	npm install
+	```
+2. Start the dev server:
+	```powershell
+	npm run dev
+	```
+	Vite prints the local URL (usually http://localhost:5173). Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop the server.
+3. For a production build:
+	```powershell
+	npm run build
+	npm run preview # optional: serve the build locally
+	```
 
-## Expanding the ESLint configuration
+## Landing page smoke test
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Use these quick checks after modifying the public site:
+
+1. **Desktop width (≥ 1024px).**
+	- Header shows logo, navigation links, and Login/Get Started buttons side-by-side.
+	- Scroll down: header gains a subtle shadow once the page moves.
+2. **Mobile width (≤ 768px).**
+	- Header collapses to a hamburger icon. Click it to open the full-screen menu overlay.
+	- Ensure the backdrop appears, body scroll locks, and selecting an item closes the menu.
+3. **Footer.**
+	- CTA card centered, quick links stacked under headings, social icons clickable.
+
+These steps validate the nav/hero/footer alignment highlighted in recent fixes.

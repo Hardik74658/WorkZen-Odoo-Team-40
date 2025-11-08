@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import signup from '../../assets/signup.jpg';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../../services/auth';
+import { login } from '../../services/auth.js';
 import { useDispatch } from 'react-redux';
 import { login as sliceLogin } from '../../redux/slices/authSlice';
 import Toast from '../layout/Toast.jsx';
@@ -25,8 +25,8 @@ const Login = () => {
 
   const demoCredentials = useMemo(
     () => ({
-      admin: { email: 'admin@workzen.demo', password: 'Admin@123' },
-      employee: { email: 'employee@workzen.demo', password: 'Employee@123' },
+      admin: { eid: 'WFZ-ADMIN-001', password: 'Admin@123' },
+      employee: { eid: 'WFZ-EMP-001', password: 'Employee@123' },
     }),
     []
   );
@@ -34,7 +34,7 @@ const Login = () => {
   const handlePrefill = (role) => {
     const creds = demoCredentials[role];
     if (!creds) return;
-    setValue('email', creds.email, { shouldValidate: true, shouldDirty: true });
+    setValue('eid', creds.eid, { shouldValidate: true, shouldDirty: true });
     setValue('password', creds.password, { shouldValidate: true, shouldDirty: true });
     setToastMessage(`Filled demo credentials for ${role === 'admin' ? 'Admin' : 'Employee'}.`);
   };
@@ -44,15 +44,23 @@ const Login = () => {
     setError(''); // Clear previous errors
     try {
       const payload = {
-        email: data.email.trim(),
+        eid: data.eid.trim(),
         password: data.password,
       };
 
       const res = await login(payload);
       if (res?.status === 200) {
-        localStorage.setItem('userId', res.data.user._id);
-        localStorage.setItem('role', res.data.user.role.name);
-        dispatch(sliceLogin(res.data));
+        const userPayload = res?.data?.user || res?.data || {};
+        if (userPayload?.eid) {
+          localStorage.setItem('userId', userPayload.eid);
+        }
+        if (userPayload?.role_name) {
+          localStorage.setItem('role', userPayload.role_name);
+        } else if (userPayload?.role?.name) {
+          localStorage.setItem('role', userPayload.role.name);
+        }
+
+        dispatch(sliceLogin(userPayload));
         setLoader(false);
         setToastMessage('Login successful!');
         navigate('/landing_page');
@@ -61,7 +69,8 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError(error.response?.data?.detail || error.message || 'Network error');
+      const backendMessage = error?.data?.detail || error?.data?.message || error?.message;
+      setError(backendMessage || 'Network error');
       setLoader(false);
     }
   };
@@ -129,29 +138,25 @@ const Login = () => {
             </p>
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
-            {/* Email Field */}
+            {/* Employee Identifier Field */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-900" htmlFor="email">
-                Email Address
+              <label className="mb-2 block text-sm font-medium text-gray-900" htmlFor="eid">
+                Employee ID or Email
               </label>
               <input
-                type="email"
-                placeholder="example@example.com"
-                id="email"
-                {...register('email', {
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^\S+@\S+$/,
-                    message: 'Invalid email address',
-                  },
+                type="text"
+                placeholder="WFZ-EMP-001"
+                id="eid"
+                {...register('eid', {
+                  required: 'Employee ID or email is required',
                 })}
                 className="w-full rounded-2xl border border-[var(--brand-purple)]/20 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-muted focus:border-[var(--brand-purple)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-purple)]/30"
-                autoComplete="email"
-                aria-invalid={Boolean(errors.email)}
+                autoComplete="username"
+                aria-invalid={Boolean(errors.eid)}
               />
-              {errors.email && (
+              {errors.eid && (
                 <p className="mt-1 text-sm text-[var(--accent-red)]" role="alert">
-                  {errors.email.message}
+                  {errors.eid.message}
                 </p>
               )}
             </div>

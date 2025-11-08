@@ -21,7 +21,7 @@ export const Hero = () => {
   ];
 
   return (
-  <section className="relative overflow-hidden bg-gradient-to-br from-white via-white to-purple-50/40 pt-28 pb-20 sm:pt-36 sm:pb-24 lg:pt-44 lg:pb-28">
+  <section className="relative overflow-hidden bg-gradient-to-br from-white via-white to-purple-50/40 pt-16 pb-20 sm:pt-24 sm:pb-24 lg:pt-32 lg:pb-28">
       {/* Decorative elements - floating icons */}
       <motion.div 
         className="absolute top-20 left-[10%] w-16 h-16"
@@ -157,7 +157,7 @@ export const Hero = () => {
       </div>
 
       {/* Add animations to stylesheet */}
-      <style jsx>{`
+      <style>{`
         @keyframes blob {
           0% {
             transform: translate(0px, 0px) scale(1);
