@@ -54,22 +54,83 @@ const Login = () => {
       if (res?.status == 200) {
         const token = res?.data?.token || '';
         const userPayload = res?.data?.user || res?.data || {};
-        if (userPayload?.eid) {
-          localStorage.setItem('userId', userPayload.eid);
+        const normalizedUser = {
+          eid: userPayload?.eid || '',
+          name: userPayload?.name || '',
+          role:
+            userPayload?.role_name ||
+            userPayload?.role?.name ||
+            userPayload?.role ||
+            '',
+          roleId:
+            userPayload?.role_id ||
+            userPayload?.role?.rid ||
+            userPayload?.role?.id ||
+            '',
+          company:
+            userPayload?.company?.name ||
+            userPayload?.company ||
+            '',
+          companyId:
+            userPayload?.company_id ||
+            userPayload?.company?.id ||
+            '',
+        };
+
+        if (typeof window !== 'undefined') {
+          const storage = window.localStorage;
+          ['userEid', 'userRole', 'userRoleId'].forEach((key) => storage.removeItem(key));
+
+          if (normalizedUser.eid) {
+            storage.setItem('userId', normalizedUser.eid);
+          } else {
+            storage.removeItem('userId');
+          }
+
+          if (normalizedUser.name) {
+            storage.setItem('userName', normalizedUser.name);
+          } else {
+            storage.removeItem('userName');
+          }
+
+          if (normalizedUser.role) {
+            storage.setItem('role', normalizedUser.role);
+          } else {
+            storage.removeItem('role');
+          }
+
+          if (normalizedUser.roleId !== '') {
+            storage.setItem('roleId', String(normalizedUser.roleId));
+          } else {
+            storage.removeItem('roleId');
+          }
+
+          if (normalizedUser.company) {
+            storage.setItem('userCompany', normalizedUser.company);
+          } else {
+            storage.removeItem('userCompany');
+          }
+
+          if (normalizedUser.companyId !== '') {
+            storage.setItem('userCompanyId', String(normalizedUser.companyId));
+          } else {
+            storage.removeItem('userCompanyId');
+          }
+
+          if (token) {
+            storage.setItem('authToken', token);
+          } else {
+            storage.removeItem('authToken');
+          }
+
+          storage.setItem('userProfile', JSON.stringify(normalizedUser));
         }
-        if (userPayload?.role_name) {
-          localStorage.setItem('role', userPayload.role_name);
-        } else if (userPayload?.role?.name) {
-          localStorage.setItem('role', userPayload.role.name);
-        }
+
         if (token) {
-          localStorage.setItem('authToken', token);
           setCookie('authToken', token);
         }
-        if (userPayload && Object.keys(userPayload).length > 0) {
-          const serializedUser = JSON.stringify(userPayload);
-          setCookie('userData', serializedUser);
-        }
+        const serializedUser = JSON.stringify({ ...normalizedUser, token });
+        setCookie('userData', serializedUser);
 
         dispatch(sliceLogin({ ...userPayload, token }));
         setLoader(false);
