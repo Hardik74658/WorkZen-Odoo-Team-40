@@ -11,6 +11,7 @@ import CompanyRegistration from './components/Regestration/CompanyRegistration.j
 import ForgotPassword from './components/Regestration/ForgotPassword.jsx';
 import ResetPassword from './components/Regestration/ResetPassword.jsx';
 import { Employees } from './components/Employees.jsx';
+import AddUser from './components/Pages/AddUser.jsx';
 
 
 function App() {
@@ -112,6 +113,15 @@ function App() {
         element={
           <AuthLayout authentication={true}>
             <Employees />
+          </AuthLayout>
+        }
+      />
+
+      <Route
+        path="/add-user"
+        element={
+          <AuthLayout authentication={true}>
+            <AddUser />
           </AuthLayout>
         }
       />

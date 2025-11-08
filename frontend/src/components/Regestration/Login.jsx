@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { login as sliceLogin } from '../../redux/slices/authSlice';
 import Toast from '../layout/Toast.jsx';
 import Loader from '../layout/Loader.jsx';
+import { deleteCookie, setCookie, setCookieJSON } from '../../utils/cookies.js';
 
 const Login = () => {
   const demoCredentials = {
@@ -28,14 +29,6 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loader, setLoader] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
-
-  const setCookie = (name, value, days = 7) => {
-    if (typeof document === 'undefined' || typeof window === 'undefined') return;
-    const encodedValue = encodeURIComponent(value);
-    const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-    const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';
-    document.cookie = `${name}=${encodedValue}; expires=${expires}; path=/; SameSite=Lax${secureFlag}`;
-  };
 
   const onSubmit = async (data) => {
     setLoader(true);
@@ -77,60 +70,20 @@ const Login = () => {
             '',
         };
 
-        if (typeof window !== 'undefined') {
-          const storage = window.localStorage;
-          ['userEid', 'userRole', 'userRoleId'].forEach((key) => storage.removeItem(key));
-
-          if (normalizedUser.eid) {
-            storage.setItem('userId', normalizedUser.eid);
-          } else {
-            storage.removeItem('userId');
-          }
-
-          if (normalizedUser.name) {
-            storage.setItem('userName', normalizedUser.name);
-          } else {
-            storage.removeItem('userName');
-          }
-
-          if (normalizedUser.role) {
-            storage.setItem('role', normalizedUser.role);
-          } else {
-            storage.removeItem('role');
-          }
-
-          if (normalizedUser.roleId !== '') {
-            storage.setItem('roleId', String(normalizedUser.roleId));
-          } else {
-            storage.removeItem('roleId');
-          }
-
-          if (normalizedUser.company) {
-            storage.setItem('userCompany', normalizedUser.company);
-          } else {
-            storage.removeItem('userCompany');
-          }
-
-          if (normalizedUser.companyId !== '') {
-            storage.setItem('userCompanyId', String(normalizedUser.companyId));
-          } else {
-            storage.removeItem('userCompanyId');
-          }
-
-          if (token) {
-            storage.setItem('authToken', token);
-          } else {
-            storage.removeItem('authToken');
-          }
-
-          storage.setItem('userProfile', JSON.stringify(normalizedUser));
-        }
+        ['authToken', 'userId', 'userName', 'userRole', 'userRoleId', 'userCompany', 'userCompanyId', 'userProfile', 'userData'].forEach((key) => deleteCookie(key));
 
         if (token) {
-          setCookie('authToken', token);
+          setCookie('authToken', token, { days: 7 });
         }
-        const serializedUser = JSON.stringify({ ...normalizedUser, token });
-        setCookie('userData', serializedUser);
+
+        setCookie('userId', normalizedUser.eid || '', { days: 7 });
+        setCookie('userName', normalizedUser.name || '', { days: 7 });
+        setCookie('userRole', normalizedUser.role || '', { days: 7 });
+        setCookie('userRoleId', normalizedUser.roleId || '', { days: 7 });
+        setCookie('userCompany', normalizedUser.company || '', { days: 7 });
+        setCookie('userCompanyId', normalizedUser.companyId || '', { days: 7 });
+        setCookieJSON('userProfile', normalizedUser, { days: 7 });
+        setCookieJSON('userData', { ...normalizedUser, token }, { days: 7 });
 
         dispatch(sliceLogin({ ...userPayload, token }));
         setLoader(false);
