@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Founders Nexus</title>
+    <!-- Add this meta tag for proper mobile display -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Updated CSS to fix scrolling issues -->
+    <style>
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        /* Changed from overflow: hidden to allow scrolling */
+        overflow: auto;
+      }
+      
+      /* Theme elements for CometChat to use for styling */
+      #light-theme, #dark-theme {
+        position: absolute;
+        left: -9999px;
+        top: -9999px;
+        visibility: hidden;
+      }
+      
+      /* Fix for CometChat container only */
+      #cometchat-container, .cometchat-container {
+        width: 100vw;
+        height: 100vh;
+        /* Keep this as hidden to prevent double scrollbars in the chat interface */
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Theme elements needed by CometChat for styling -->
+    <div id="light-theme" data-theme="light"></div>
+    <div id="dark-theme" data-theme="dark"></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

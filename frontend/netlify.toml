@@ -1,0 +1,29 @@
+# Netlify configuration file
+
+# Build settings
+[build]
+  command = "npm run build" # Ensure this matches your actual build command
+  publish = "dist" # Changed from "build" to "dist" which might be your actual output directory
+
+# Headers to handle mixed content
+[[headers]]
+  for = "/*"
+  [headers.values]    # Security headers - Expanded to explicitly include API server
+    Content-Security-Policy = "default-src 'self' https: http:; connect-src 'self' https: http: ws: wss: https://13.232.209.194; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.talkjs.com; style-src 'self' 'unsafe-inline' https://cdn.talkjs.com; img-src 'self' data: https: http:; font-src 'self' data: https:;"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "no-referrer-when-downgrade"
+
+# Proxy API calls to avoid CORS and mixed content issues - Fixed to properly handle API paths
+[[redirects]]
+  from = "/api/*"
+  to = "http://13.232.209.194:80/:splat"
+  status = 200
+  force = true
+
+# Redirect all requests to index.html for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
