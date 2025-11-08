@@ -6,7 +6,7 @@ React + Vite SPA for the WorkZen HRMS landing experience and authenticated dashb
 
 1. Install dependencies (run from `frontend/`):
 	```powershell
-	npm i
+	npm install
 	```
 2. Start the dev server:
 	```powershell

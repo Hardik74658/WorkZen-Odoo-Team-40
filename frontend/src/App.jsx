@@ -11,6 +11,12 @@ import CompanyRegistration from './components/Regestration/CompanyRegistration.j
 import ForgotPassword from './components/Regestration/ForgotPassword.jsx';
 import ResetPassword from './components/Regestration/ResetPassword.jsx';
 import { Employees } from './components/Employees.jsx';
+import AddUser from './components/Pages/AddUser.jsx';
+import Attendance from './components/Pages/Attendance.jsx';
+import TimeOff from './components/Pages/TimeOff.jsx';
+import Payroll from './components/Pages/Payroll.jsx';
+import Reports from './components/Pages/Reports.jsx';
+import Settings from './components/Pages/Settings.jsx';
 
 
 function App() {
@@ -112,6 +118,58 @@ function App() {
         element={
           <AuthLayout authentication={true}>
             <Employees />
+          </AuthLayout>
+        }
+      />
+
+      <Route
+        path="/add-user"
+        element={
+          <AuthLayout authentication={true}>
+            <AddUser />
+          </AuthLayout>
+        }
+      />
+
+      <Route
+        path="/attendance"
+        element={
+          <AuthLayout authentication={true}>
+            <Attendance />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path="/time-off"
+        element={
+          <AuthLayout authentication={true}>
+            <TimeOff />
+          </AuthLayout>
+        }
+      />
+      <Route
+        path="/payroll"
+        element={
+          <AuthLayout authentication={true}>
+            <Payroll />
+          </AuthLayout>
+        }
+      />
+
+      <Route
+        path="/reports"
+        element={
+          <AuthLayout authentication={true}>
+            <Reports />
+          </AuthLayout>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <AuthLayout authentication={true}>
+            <Settings />
           </AuthLayout>
         }
       />

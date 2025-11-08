@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { login as sliceLogin } from '../../redux/slices/authSlice';
 import Toast from '../layout/Toast.jsx';
 import Loader from '../layout/Loader.jsx';
+import { deleteCookie, setCookie, setCookieJSON } from '../../utils/cookies.js';
 
 const Login = () => {
   const demoCredentials = {
@@ -29,14 +30,6 @@ const Login = () => {
   const [loader, setLoader] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
-  const setCookie = (name, value, days = 7) => {
-    if (typeof document === 'undefined' || typeof window === 'undefined') return;
-    const encodedValue = encodeURIComponent(value);
-    const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-    const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';
-    document.cookie = `${name}=${encodedValue}; expires=${expires}; path=/; SameSite=Lax${secureFlag}`;
-  };
-
   const onSubmit = async (data) => {
     setLoader(true);
     setError(''); // Clear previous errors
@@ -54,22 +47,43 @@ const Login = () => {
       if (res?.status == 200) {
         const token = res?.data?.token || '';
         const userPayload = res?.data?.user || res?.data || {};
-        if (userPayload?.eid) {
-          localStorage.setItem('userId', userPayload.eid);
-        }
-        if (userPayload?.role_name) {
-          localStorage.setItem('role', userPayload.role_name);
-        } else if (userPayload?.role?.name) {
-          localStorage.setItem('role', userPayload.role.name);
-        }
+        const normalizedUser = {
+          eid: userPayload?.eid || '',
+          name: userPayload?.name || '',
+          role:
+            userPayload?.role_name ||
+            userPayload?.role?.name ||
+            userPayload?.role ||
+            '',
+          roleId:
+            userPayload?.role_id ||
+            userPayload?.role?.rid ||
+            userPayload?.role?.id ||
+            '',
+          company:
+            userPayload?.company?.name ||
+            userPayload?.company ||
+            '',
+          companyId:
+            userPayload?.company_id ||
+            userPayload?.company?.id ||
+            '',
+        };
+
+        ['authToken', 'userId', 'userName', 'userRole', 'userRoleId', 'userCompany', 'userCompanyId', 'userProfile', 'userData'].forEach((key) => deleteCookie(key));
+
         if (token) {
-          localStorage.setItem('authToken', token);
-          setCookie('authToken', token);
+          setCookie('authToken', token, { days: 7 });
         }
-        if (userPayload && Object.keys(userPayload).length > 0) {
-          const serializedUser = JSON.stringify(userPayload);
-          setCookie('userData', serializedUser);
-        }
+
+        setCookie('userId', normalizedUser.eid || '', { days: 7 });
+        setCookie('userName', normalizedUser.name || '', { days: 7 });
+        setCookie('userRole', normalizedUser.role || '', { days: 7 });
+        setCookie('userRoleId', normalizedUser.roleId || '', { days: 7 });
+        setCookie('userCompany', normalizedUser.company || '', { days: 7 });
+        setCookie('userCompanyId', normalizedUser.companyId || '', { days: 7 });
+        setCookieJSON('userProfile', normalizedUser, { days: 7 });
+        setCookieJSON('userData', { ...normalizedUser, token }, { days: 7 });
 
         dispatch(sliceLogin({ ...userPayload, token }));
         setLoader(false);
