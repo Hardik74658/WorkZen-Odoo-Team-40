@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from typing import List
 from config.database import get_db
 from schemas.user_schema import UserCreate, UserOut, UserLogin, AdminRegister
-from controllers.user_controller import create_user, get_all_users, login_user, admin_register, view_user_controller, update_user_controller, delete_user_controller
+from controllers.user_controller import create_user, get_all_users, login_user, admin_register, view_user_controller, update_user_controller, delete_user_controller, create_employee
+from utils.permissions import role_required
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -42,3 +43,11 @@ def update_user(eid: str, data: dict, db: Session = Depends(get_db)):
 @router.delete("/user/{eid}")
 def delete_user(eid: str, db: Session = Depends(get_db)):
     return delete_user_controller(db, eid)
+
+@router.post("/add", response_model=UserOut)
+def add_employee(
+    data: UserCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(role_required(["admin", "hr"]))  # ✅ only admin/hr allowed
+):
+    return create_employee(db, data)    
