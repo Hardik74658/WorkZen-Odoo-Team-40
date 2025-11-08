@@ -165,3 +165,14 @@ a {
         background-color: var(--surface-muted);
     }
 }
+
+/* Prevent body scroll when mobile sidebar is open */
+body.sidebar-open {
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    body.sidebar-open {
+        overflow: auto;
+    }
+}

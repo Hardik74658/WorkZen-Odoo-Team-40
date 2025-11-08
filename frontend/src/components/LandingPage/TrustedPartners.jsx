@@ -46,6 +46,7 @@ export default function TrustedPartners() {
   };
 
   return (
+    <div className='display-block'>
     <section className="bg-surface-muted/60 py-24 sm:py-32">
       <div className="section-wrapper">
         <div className="text-center">
@@ -132,5 +133,6 @@ export default function TrustedPartners() {
         </motion.div>
       </div>
     </section>
+    </div>
   );
 }

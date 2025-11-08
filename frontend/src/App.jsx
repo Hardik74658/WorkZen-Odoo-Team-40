@@ -10,6 +10,8 @@ import LandingPage from './components/LandingPage.jsx';
 import CompanyRegistration from './components/Regestration/CompanyRegistration.jsx';
 import ForgotPassword from './components/Regestration/ForgotPassword.jsx';
 import ResetPassword from './components/Regestration/ResetPassword.jsx';
+import { Employees } from './components/Employees.jsx';
+
 
 function App() {
   const dispatch = useDispatch();
@@ -103,7 +105,17 @@ function App() {
           </AuthLayout>
         }
       />
-      {/* Protected Routes */}
+
+    {/* Protected Routes */}
+      <Route
+        path="/employees"
+        element={
+          <AuthLayout authentication={false}>
+            <Employees />
+          </AuthLayout>
+        }
+      />
+
     
       {/* <Route
         path="/signup2"

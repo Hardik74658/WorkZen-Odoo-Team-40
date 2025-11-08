@@ -5,6 +5,7 @@ import { ArrowUpTrayIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outl
 import signup from '../../assets/signup.jpg';
 import Loader from '../layout/Loader.jsx';
 import Toast from '../layout/Toast.jsx';
+import { registerAdmin } from '../../services/auth.js';
 
 const CompanyRegistration = () => {
   const navigate = useNavigate();
@@ -60,34 +61,38 @@ const CompanyRegistration = () => {
     setToastMessage(null);
 
     try {
-      const payload = new FormData();
-      payload.append('companyName', formData.companyName.trim());
-      payload.append('name', formData.name.trim());
-      payload.append('email', formData.email.trim());
-      payload.append('phone', formData.phone.trim());
-      payload.append('password', formData.password);
-
       const file = formData.companyLogo?.[0];
+      let logoBase64 = null;
+
       if (file) {
-        payload.append('companyLogo', file);
+        const encodeFileToBase64 = (inputFile) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error('Unable to read file'));
+            reader.readAsDataURL(inputFile);
+          });
+
+        logoBase64 = await encodeFileToBase64(file);
       }
 
-      // TODO: Replace with actual API call when endpoint is ready
-      console.table({
-        companyName: formData.companyName,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
+      const payload = {
+        full_name: formData.name.trim(),
+        email: formData.email.trim(),
+        contact: formData.phone.trim(),
         password: formData.password,
-        hasLogo: Boolean(file),
-      });
+        company_name: formData.companyName.trim(),
+        company_logo: logoBase64,
+      };
 
-      await new Promise((resolve) => setTimeout(resolve, 900));
+      await registerAdmin(payload);
+
       setToastMessage('Company profile created! Check your email to verify the account.');
       setTimeout(() => navigate('/login'), 1200);
     } catch (error) {
       console.error('Registration error:', error);
-      setToastMessage('Unable to create company right now. Please try again later.');
+      const backendMessage = error?.data?.detail || error?.data?.message || error?.message;
+      setToastMessage(backendMessage || 'Unable to create company right now. Please try again later.');
     } finally {
       setLoading(false);
     }
