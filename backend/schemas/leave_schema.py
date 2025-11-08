@@ -26,7 +26,9 @@ class LeaveOut(BaseModel):
     status: Optional[str]
     approved_by: Optional[str]
     created_at: datetime
+    employee_name: Optional[str] = None
     updated_at: Optional[datetime]
+    approver_name: Optional[str] = None 
 
     class Config:
         orm_mode = True

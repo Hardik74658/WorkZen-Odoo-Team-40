@@ -10,3 +10,9 @@ def role_required(allowed_roles: list):
             )
         return current_user
     return wrapper
+
+def payroll_access(current_user = Depends(get_current_user)):
+    """Allow only Admin or Payroll Officer"""
+    if current_user.role.name not in ["Admin", "Payroll Officer"]:
+        raise HTTPException(status_code=403, detail="Access denied — Payroll module restricted.")
+    return current_user

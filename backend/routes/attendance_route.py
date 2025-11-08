@@ -6,7 +6,9 @@ from controllers.attendance_controller import (
     create_attendance,
     get_all_attendance,
     get_attendance_by_eid,
-    update_attendance
+    update_attendance,
+    check_in,
+    check_out
 )
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
@@ -30,3 +32,12 @@ def get_employee_attendance(eid: str, db: Session = Depends(get_db)):
 @router.put("/{attendance_id}", response_model=AttendanceOut)
 def edit_attendance(attendance_id: int, data: AttendanceUpdate, db: Session = Depends(get_db)):
     return update_attendance(db, attendance_id, data)
+
+@router.post("/checkin/{eid}/{company_id}")
+def attendance_checkin(eid: str, company_id: int, db: Session = Depends(get_db)):
+    return check_in(db, eid, company_id)
+
+# ✅ Check-Out
+@router.put("/checkout/{eid}")
+def attendance_checkout(eid: str, db: Session = Depends(get_db)):
+    return check_out(db, eid)
