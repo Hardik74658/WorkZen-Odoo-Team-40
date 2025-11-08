@@ -1,0 +1,72 @@
+/* Basic styles for Reports page - keep consistent with app's clean theme */
+.rz-page {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+  min-height: 70vh;
+  color: #1f2937; /* neutral-800 */
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+.rz-sidebar {
+  width: 160px;
+  border-right: 1px solid #e6e6e6;
+  padding: 1rem 0.5rem;
+  background: #ffffff;
+}
+.rz-logo {
+  font-weight: 700;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  color: #2563eb; /* blue-600 */
+}
+.rz-sidebar-item {
+  padding: 0.6rem 0.75rem;
+  margin: 0.25rem 0.1rem;
+  border-radius: 4px;
+  color: #374151;
+}
+.rz-sidebar-item.active {
+  background: #e6f0ff;
+  color: #0f172a;
+  font-weight: 600;
+}
+.rz-main {
+  flex: 1;
+  padding: 1rem;
+}
+.rz-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.rz-topbar h2 { margin: 0; font-size: 1.125rem; color: #0f172a; }
+.rz-controls { display: flex; gap: 0.75rem; align-items: center; }
+.rz-field { display: flex; flex-direction: column; font-size: 0.85rem; }
+.rz-field select { margin-top: 0.25rem; padding: 0.35rem 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; }
+.rz-print-btn { background:#2563eb; color: #fff; border: none; padding: 0.5rem 0.9rem; border-radius: 6px; cursor:pointer; }
+.rz-content { display:flex; gap:1rem; align-items:flex-start; }
+.rz-form-area { width: 360px; }
+.rz-card { background: #fff; border: 1px solid #e6e6e6; padding: 1rem; border-radius: 6px; }
+.rz-card h3 { margin-top:0; }
+.muted { color: #6b7280; font-size: 0.9rem; }
+.rz-field-row { display:flex; gap:0.5rem; margin-top:0.75rem; }
+.rz-field-row label { flex:1; display:flex; flex-direction:column; }
+
+.rz-preview { flex:1; display:flex; justify-content:center; }
+.rz-report-sheet { width: 480px; height: 640px; border: 1px solid #d1d5db; background: #fff; padding: 18px; box-shadow: 0 6px 18px rgba(15,23,42,0.06); border-radius:4px; }
+.rz-report-header { text-align:left; margin-bottom: 12px; }
+.rz-report-header .company { color:#c026d3; font-weight:700; }
+.rz-report-header .title { font-weight:700; margin-top:6px; }
+.rz-report-header .meta { display:flex; justify-content:space-between; color:#9ca3af; margin-top:10px; font-size:0.9rem; }
+.salary-table { width:100%; border-collapse: collapse; font-size: 0.95rem; }
+.salary-table th { text-align:left; padding:8px 6px; color:#ef4444; border-bottom:1px solid #eee; }
+.salary-table td { padding:8px 6px; border-bottom:1px dashed #f3f4f6; }
+.salary-table tr.net td { font-weight:700; color:#b91c1c; }
+
+/* Print-friendly adjustments */
+@media print {
+  body * { visibility: hidden; }
+  .rz-report-sheet, .rz-report-sheet * { visibility: visible; }
+/* Deprecated: legacy Reports styles have been replaced with Tailwind utility classes. */
+}
