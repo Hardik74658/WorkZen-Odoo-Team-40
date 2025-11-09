@@ -48,6 +48,6 @@ def delete_user(eid: str, db: Session = Depends(get_db)):
 def add_employee(
     data: UserCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(role_required(["admin", "hr"]))  # ✅ only admin/hr allowed
+    current_user = Depends(role_required(["admin", "hr_officer"]))  # ✅ normalized role names
 ):
-    return create_employee(db, data)    
+    return create_employee(db, data)   

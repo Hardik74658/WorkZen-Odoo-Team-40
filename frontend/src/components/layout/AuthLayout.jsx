@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
+import { attendanceCheckIn, attendanceCheckOut, fetchMyAttendance } from '../../services/attendance.js';
 import Sidebar, { SIDEBAR_LINKS } from './Sidebar';
 import Loader from './Loader';
 import { getCookie } from '../../utils/cookies.js';
@@ -136,11 +137,64 @@ const AuthLayout = ({ children, authentication }) => {
     return <div className="min-h-screen bg-white">{children}</div>;
   }
 
+  // Local attendance status state for Navbar
+  const [attendanceStatus, setAttendanceStatus] = React.useState({ state: 'out', checkInTime: null });
+
+  const refreshMyAttendance = React.useCallback(async () => {
+    try {
+      const res = await fetchMyAttendance();
+      const today = new Date().toISOString().slice(0,10);
+      const records = Array.isArray(res.data) ? res.data : [];
+      const todayRecord = records.find(r => String(r.date).startsWith(today));
+      if (todayRecord?.check_in && !todayRecord?.check_out) {
+        setAttendanceStatus({ state: 'in', checkInTime: todayRecord.date + 'T' + todayRecord.check_in });
+      } else if (todayRecord?.check_out) {
+        // Mark completed so UI won't attempt second check-in
+        setAttendanceStatus({ state: 'completed', checkInTime: null, workedHours: todayRecord.worked_hours, checkIn: todayRecord.check_in, checkOut: todayRecord.check_out });
+      } else {
+        setAttendanceStatus({ state: 'out', checkInTime: null });
+      }
+    } catch {/* silent */}
+  }, []);
+
+  const handleCheckIn = async () => {
+    if (attendanceStatus.state === 'completed') return; // guard
+    try {
+      const { data } = await attendanceCheckIn();
+      setAttendanceStatus({ state: 'in', checkInTime: data.date + 'T' + data.check_in_time });
+      // Notify other views (e.g., Attendance page) to refetch immediately
+      window.dispatchEvent(new Event('attendance:refresh'));
+    } catch (e) {
+      console.error('Check-in failed', e?.response?.data || e.message);
+    }
+  };
+
+  const handleCheckOut = async () => {
+    try {
+      await attendanceCheckOut();
+      // Immediately refresh to capture worked hours
+      await refreshMyAttendance();
+      // Notify other views (e.g., Attendance page) to refetch immediately
+      window.dispatchEvent(new Event('attendance:refresh'));
+    } catch (e) {
+      console.error('Check-out failed', e?.response?.data || e.message);
+    }
+  };
+
+  React.useEffect(() => { refreshMyAttendance(); }, [refreshMyAttendance]);
+
+  // Listen for global attendance refresh events fired from pages/components
+  React.useEffect(() => {
+    const handler = () => { refreshMyAttendance(); };
+    window.addEventListener('attendance:refresh', handler);
+    return () => window.removeEventListener('attendance:refresh', handler);
+  }, [refreshMyAttendance]);
+
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar userRole={normalizedRole} />
       <div className="flex flex-1 flex-col">
-        <Navbar />
+        <Navbar attendanceStatus={attendanceStatus} onCheckIn={handleCheckIn} onCheckOut={handleCheckOut} />
         <main className="flex-1 overflow-y-auto px-6 py-8">{children}</main>
       </div>
     </div>

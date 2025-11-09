@@ -49,6 +49,7 @@ const Navbar = ({
   }, []);
 
   const isCheckedIn = attendanceStatus?.state === 'in';
+  const isCompleted = attendanceStatus?.state === 'completed';
   const checkInTime = attendanceStatus?.checkInTime
     ? new Date(attendanceStatus.checkInTime)
     : null;
@@ -84,25 +85,28 @@ const Navbar = ({
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">Attendance</span>
               <span className="text-sm font-semibold text-gray-900">
-                {isCheckedIn ? 'Checked in' : 'Not checked in'}
+                {isCompleted ? 'Completed' : isCheckedIn ? 'Checked in' : 'Not checked in'}
               </span>
-              {checkInTime && (
-                <span className="text-xs text-[var(--text-muted)]">
-                  Since {formatTime(checkInTime)}
-                </span>
+              {isCheckedIn && checkInTime && (
+                <span className="text-xs text-[var(--text-muted)]">Since {formatTime(checkInTime)}</span>
+              )}
+              {isCompleted && attendanceStatus.workedHours != null && (
+                <span className="text-xs text-[var(--text-muted)]">Worked {attendanceStatus.workedHours}h</span>
               )}
             </div>
-            <button
-              type="button"
-              onClick={isCheckedIn ? handleCheckOut : handleCheckIn}
-              className={`rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--brand-purple)]/30 ${
-                isCheckedIn
-                  ? 'bg-white text-[var(--accent-red)] border border-[var(--accent-red)]/40 hover:bg-[var(--accent-red)]/10'
-                  : 'bg-[var(--brand-purple)] text-white shadow-[0_12px_25px_rgba(111,66,193,0.2)] hover:bg-[var(--brand-purple-soft)]'
-              }`}
-            >
-              {isCheckedIn ? 'Check Out' : 'Check In'}
-            </button>
+            {!isCompleted && (
+              <button
+                type="button"
+                onClick={isCheckedIn ? handleCheckOut : handleCheckIn}
+                className={`rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--brand-purple)]/30 ${
+                  isCheckedIn
+                    ? 'bg-white text-[var(--accent-red)] border border-[var(--accent-red)]/40 hover:bg-[var(--accent-red)]/10'
+                    : 'bg-[var(--brand-purple)] text-white shadow-[0_12px_25px_rgba(111,66,193,0.2)] hover:bg-[var(--brand-purple-soft)]'
+                }`}
+              >
+                {isCheckedIn ? 'Check Out' : 'Check In'}
+              </button>
+            )}
           </div>
         </div>
 

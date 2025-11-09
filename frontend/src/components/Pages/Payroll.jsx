@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import axios from 'axios';
 import Loader from '../layout/Loader';
 import { getCurrentUser } from '../../services/auth';
+import { getCookie, getCookieJSON } from '../../utils/cookies.js';
 
 const ALLOWED_ROLES = ['admin', 'payroll_officer'];
 
@@ -260,9 +261,19 @@ export default function Payroll() {
 
     if (fromCurrent) return fromCurrent;
 
-    return (
+    const fromRedux = (
       normalizeRoleValue(reduxUser?.role) ||
       normalizeRoleValue(reduxUser?.role_name) ||
+      null
+    );
+    if (fromRedux) return fromRedux;
+
+    // Final fallback to cookies, aligned with Sidebar logic
+    const cookieUser = getCookieJSON('userData') || getCookieJSON('userProfile');
+    return (
+      normalizeRoleValue(cookieUser?.role) ||
+      normalizeRoleValue(cookieUser?.role_name) ||
+      normalizeRoleValue(getCookie('userRole')) ||
       null
     );
   }, [currentUser, reduxUser]);

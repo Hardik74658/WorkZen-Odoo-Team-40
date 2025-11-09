@@ -114,7 +114,8 @@ def login_user(db: Session, eid: str, password: str):
             "name": user.name,
             "role": user.role.name,
             "company": user.company.name,
-            "role_id": user.rid,
+            # user model has role_id (FK) and role.rid; user.rid does not exist
+            "role_id": user.role_id,
             "company_id": user.company_id
         }
     }
