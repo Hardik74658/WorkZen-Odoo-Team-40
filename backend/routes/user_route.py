@@ -35,7 +35,12 @@ def view_user(eid: str, db: Session = Depends(get_db)):
 
 # ✏️ Update user info
 @router.put("/user/{eid}", response_model=UserOut)
-def update_user(eid: str, data: dict, db: Session = Depends(get_db)):
+def update_user(
+    eid: str,
+    data: dict,
+    db: Session = Depends(get_db),
+    current_user = Depends(role_required(["admin", "hr_officer"]))
+):
     return update_user_controller(db, eid, data)
 
 

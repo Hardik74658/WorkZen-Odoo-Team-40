@@ -7,7 +7,7 @@ import {
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import Loader from '../layout/Loader.jsx';
-import { fetchRoles, fetchUsers, updateUser } from '../../services/user.js';
+import { fetchSettingsRoles, fetchSettingsUsers, updateUserRole } from '../../services/user.js';
 import { getCookie } from '../../utils/cookies.js';
 
 const ROLE_LABELS = {
@@ -127,7 +127,15 @@ const Settings = () => {
     }
     setError('');
     try {
-      const [usersResponse, rolesResponse] = await Promise.all([fetchUsers(), fetchRoles()]);
+      // Determine company id from cookie / auth user for scoping settings query
+      const companyId = authUser?.company_id || authUser?.user?.company_id || getCookie('userCompanyId');
+      if (!companyId) {
+        throw new Error('Missing company context for settings');
+      }
+      const [usersResponse, rolesResponse] = await Promise.all([
+        fetchSettingsUsers(companyId),
+        fetchSettingsRoles(),
+      ]);
 
       const normalizedRoles = (rolesResponse?.data || [])
         .map((role) => {
@@ -146,7 +154,17 @@ const Settings = () => {
         .sort((a, b) => a.label.localeCompare(b.label));
 
       setRoleOptions(normalizedRoles);
-      setUsers(usersResponse?.data || []);
+      // Backend returns list of user dicts. Normalize keys if needed.
+      const rawUsers = usersResponse?.data || [];
+      const normalizedUsers = rawUsers.map((u) => ({
+        eid: u.eid,
+        name: u.name,
+        company_email: u.company_email || null,
+        personal_email: u.personal_email || null,
+        role_id: u.role_id || null,
+        role_name: u.role_name || u.role || null,
+      }));
+      setUsers(normalizedUsers);
       setRoleChanges({});
     } catch (err) {
       console.error('Failed to load settings data:', err);
@@ -185,11 +203,16 @@ const Settings = () => {
     setSaving((prev) => ({ ...prev, [user.eid]: true }));
     setBanner(null);
     try {
-      const response = await updateUser(user.eid, { role_id: pendingRoleId });
-      const updatedUser = response?.data || {};
-      setUsers((prev) =>
-        prev.map((item) => (item.eid === user.eid ? { ...item, ...updatedUser } : item))
-      );
+      const response = await updateUserRole(user.eid, pendingRoleId);
+      const updatedUser = response?.data?.user || {};
+      setUsers((prev) => prev.map((item) => {
+        if (item.eid !== user.eid) return item;
+        return {
+          ...item,
+          role_id: updatedUser.role_id ?? pendingRoleId,
+          role_name: updatedUser.role_name || item.role_name,
+        };
+      }));
       setRoleChanges((prev) => {
         const { [user.eid]: _omit, ...rest } = prev;
         return rest;

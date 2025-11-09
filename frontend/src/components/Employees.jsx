@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import EmployeeCard from './Employees/EmployeeCard'
+import { fetchUsers } from '../services/user.js'
 
 const demoEmployees = [
   {
@@ -41,7 +43,65 @@ const demoEmployees = [
 ]
 
 export const Employees = ({ employees }) => {
-  const employeeList = Array.isArray(employees) && employees.length > 0 ? employees : demoEmployees
+  const location = useLocation()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [fetched, setFetched] = useState([])
+
+  // Fetch fresh employees whenever this page is (re)entered
+  useEffect(() => {
+    let cancelled = false
+    const run = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const res = await fetchUsers()
+        if (cancelled) return
+        const users = Array.isArray(res?.data) ? res.data : []
+        // Map backend users to EmployeeCard shape
+        const mapped = users.map((u) => ({
+          id: u?.eid,
+          name: u?.name,
+          email: u?.company_email || u?.personal_email,
+          phone: '-',
+          position: u?.position || '-',
+          department: u?.department || '-',
+          avatar: u?.avatar || '', // backend doesn't provide yet; keep for future
+          status: u?.status || '',
+          joinedDate: u?.date_of_joining ? new Date(u.date_of_joining).toLocaleDateString() : '-',
+          role: u?.role_name || 'Employee',
+        }))
+        setFetched(mapped)
+      } catch (err) {
+        console.error('Failed to fetch users:', err)
+        setError('Could not refresh employees right now.')
+        setFetched([])
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    run()
+    return () => {
+      cancelled = true
+    }
+  }, [location.key])
+
+  const propEmployees = Array.isArray(employees) ? employees : []
+  const employeeList = useMemo(() => {
+    // Combine fetched + any provided prop employees + keep demo employees
+    // Prefer fetched first, then provided, then demos
+    const combined = [...fetched, ...propEmployees]
+    // Always keep demos as well
+    combined.push(...demoEmployees)
+    // Deduplicate by id if present
+    const seen = new Set()
+    return combined.filter((e) => {
+      const key = e?.id || `${e?.name}-${e?.email}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }, [fetched, propEmployees])
 
   return (
     <section className="space-y-6">
@@ -51,6 +111,14 @@ export const Employees = ({ employees }) => {
           Keep track of everyone on the team. Filter by role, department, or attendance status.
         </p>
       </header>
+
+      {error ? (
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
+      ) : null}
+
+      {loading ? (
+        <div className="text-sm text-muted">Refreshing employees…</div>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {employeeList.map((employee) => (

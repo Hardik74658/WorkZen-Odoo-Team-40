@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import defaultAvatar from '../../assets/ProfilePic.png'
 
 // Small helper to map attendance/status to colors
 const statusColor = (status) => {
@@ -37,6 +36,8 @@ export default function EmployeeCard({ employee = {}, className = '' }) {
     (value) => value && value !== '-' && String(value).trim().length > 0,
   )
 
+  const initials = getInitials(name)
+
   return (
     <>
       <div
@@ -47,12 +48,20 @@ export default function EmployeeCard({ employee = {}, className = '' }) {
         className={`group relative flex w-full flex-col overflow-hidden rounded-2xl border border-[var(--brand-purple)]/15 bg-white shadow-[0_16px_44px_rgba(15,23,42,0.1)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_68px_rgba(111,66,193,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-purple)] ${className}`}
       >
         <div className="relative h-36 w-full overflow-hidden rounded-t-2xl">
-          <img
-            src={avatar || defaultAvatar}
-            alt={name}
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-            loading="lazy"
-          />
+          {avatar ? (
+            <img
+              src={avatar}
+              alt={name}
+              className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-pulse flex items-center justify-center">
+              <div className="text-4xl font-semibold text-white/90 drop-shadow" aria-label={`Avatar for ${name}`}>
+                {initials}
+              </div>
+            </div>
+          )}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-full rounded-t-2xl border-b border-white/40 bg-gradient-to-b from-white/25 via-transparent to-transparent" aria-hidden="true" />
         </div>
 
@@ -76,11 +85,17 @@ export default function EmployeeCard({ employee = {}, className = '' }) {
 
           <div className="relative bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
             <div className="flex items-start gap-4 border-b border-[var(--brand-purple)]/10 p-6">
-              <img
-                src={avatar || defaultAvatar}
-                alt={name}
-                className="w-20 h-20 rounded-full object-cover border"
-              />
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt={name}
+                  className="w-20 h-20 rounded-full object-cover border"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full border bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-pulse flex items-center justify-center">
+                  <span className="text-xl font-semibold text-white/90" aria-hidden="true">{initials}</span>
+                </div>
+              )}
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-gray-900">{name}</h2>
                 <p className="mt-1 text-sm text-muted">
@@ -137,4 +152,12 @@ function DetailRow({ label, value, tone }) {
       </div>
     </div>
   )
+}
+
+// Helpers ----------------------------------------------------
+function getInitials(name) {
+  if (!name || typeof name !== 'string') return '?'
+  const parts = name.trim().split(/\s+/)
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }

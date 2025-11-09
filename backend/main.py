@@ -7,6 +7,7 @@ from routes.user_route import router as userRouter
 from routes.attendance_route import router as attendance_router
 from routes.leave_route import router as leave_router
 from routes.payroll_route import router as payroll_router
+from routes.setting_route import router as settings_router
 
 app = FastAPI()
 
@@ -41,6 +42,7 @@ app.include_router(userRouter)
 app.include_router(attendance_router)  # Include attendance router\
 app.include_router(leave_router)  # Include attendance router
 app.include_router(payroll_router)  # Include payroll router
+app.include_router(settings_router)  # Settings (admin)
 
 # Simple health probe to verify backend availability
 @app.get("/health")

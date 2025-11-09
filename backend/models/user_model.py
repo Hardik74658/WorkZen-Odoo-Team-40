@@ -24,7 +24,7 @@ class User(Base):
 
     
     bank_account = Column(String(50), nullable=True)           # Bank A/c number or IBAN
-    manager_id = Column(String(30), ForeignKey("users.eid"), nullable=True)  # R
+    manager_id = Column(String(30), ForeignKey("user.eid"), nullable=True)  # R
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
