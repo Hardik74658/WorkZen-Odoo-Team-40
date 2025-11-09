@@ -17,7 +17,7 @@ import TimeOff from './components/Pages/TimeOff.jsx';
 import Payroll from './components/Pages/Payroll.jsx';
 import Reports from './components/Pages/Reports.jsx';
 import Settings from './components/Pages/Settings.jsx';
-
+import NewUsers from './pages/NewUsers.jsx'; // new page
 
 function App() {
   const dispatch = useDispatch();
@@ -72,8 +72,6 @@ function App() {
         dispatch(logout());
       });
   }, [dispatch]);
-
-  
 
   return (
     <Routes>
@@ -132,6 +130,15 @@ function App() {
       />
 
       <Route
+        path="/new-users"
+        element={
+          <AuthLayout authentication={true}>
+            <NewUsers />
+          </AuthLayout>
+        }
+      />
+
+      <Route
         path="/attendance"
         element={
           <AuthLayout authentication={true}>
@@ -174,15 +181,6 @@ function App() {
         }
       />
 
-    
-      {/* <Route
-        path="/signup2"
-        element={
-          <AuthLayout authentication={true}>
-            <Signup />
-          </AuthLayout>
-        }
-      /> */}
       <Route
         path="/forgotpwd"
         element={
@@ -199,24 +197,6 @@ function App() {
           </AuthLayout>
         }
       />
-      {/* <Route
-        path="/users"
-        element={
-          <AuthLayout authentication={true}>
-            <Users />
-          </AuthLayout>
-        }
-      /> */}
-    
-      {/* <Route
-        path="/admin"
-        element={
-          <AuthLayout authentication={true}>
-            <AdminDashboard />
-          </AuthLayout>
-        }
-      /> */}
-     
     </Routes>
   );
 }

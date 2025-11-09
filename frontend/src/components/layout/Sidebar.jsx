@@ -42,6 +42,13 @@ export const SIDEBAR_LINKS = [
     allowedRoles: ['admin', 'hr_officer']
   },
   {
+    name: 'New Users',
+    path: '/new-users',
+    icon: UserCircleIcon,
+    description: 'Send credentials',
+    allowedRoles: ['admin', 'hr_officer']
+  },
+  {
     name: 'Attendance',
     path: '/attendance',
     icon: CalendarDaysIcon,
